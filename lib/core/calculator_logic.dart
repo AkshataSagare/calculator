@@ -9,6 +9,8 @@ String calculateResult(String expression) {
         .replaceAll('÷', '/')
         .replaceAll('%', '/100');
 
+    finalExpression = finalExpression.replaceFirst(RegExp(r'[+\-*/]$'), '');
+
     ExpressionParser parser = GrammarParser();
     Expression exp = parser.parse(finalExpression);
 

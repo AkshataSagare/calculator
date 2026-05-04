@@ -20,9 +20,12 @@ class CalculatorScreen extends StatelessWidget {
               builder: (context, state) {
                 String expression = '';
                 String result = '0';
+                bool isResultMode = false;
+
                 if (state is CalculatorUpdated) {
                   expression = state.expression;
                   result = state.result;
+                  isResultMode = state.isResultMode;
                 }
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -31,10 +34,10 @@ class CalculatorScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 10.0),
                       child: Text(
                         expression,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 50,
-                          fontWeight: FontWeight.bold,
+                          fontSize: isResultMode ? 20 : 40,
+                          fontWeight: isResultMode ? FontWeight.normal : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -42,9 +45,10 @@ class CalculatorScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 10.0),
                       child: Text(
                         result,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 30,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isResultMode ? 40 : 24,
+                          fontWeight: isResultMode ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                     ),

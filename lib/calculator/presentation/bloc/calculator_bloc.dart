@@ -1,35 +1,57 @@
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 
 import '../../../core/calculator_logic.dart';
+import '../../../core/utils/buttons.dart';
 
 part 'calculator_event.dart';
 part 'calculator_state.dart';
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
-  CalculatorBloc() : super(CalculatorUpdated(expression: '', result: '0')) {
-
+  CalculatorBloc() : super(CalculatorUpdated(expression: '', result: '0', isResultMode: false)) {
     on<ButtonPressed>((event, emit) {
-      final updatedExpression = (state as CalculatorUpdated).expression + event.button;
-      emit((state as CalculatorUpdated).copyWith(expression: updatedExpression));
+      final updatedExpression =
+          (state as CalculatorUpdated).expression + event.button;
+      final result = calculateResult(updatedExpression);
+      if (Buttons.operators.contains(event.button) &&
+          (state as CalculatorUpdated).expression.isNotEmpty &&
+          Buttons.operators.contains(
+            (state as CalculatorUpdated)
+                .expression[(state as CalculatorUpdated).expression.length - 1],
+          )) {
+        return;
+      }
+      emit(
+        (state as CalculatorUpdated).copyWith(
+          expression: updatedExpression,
+          result: result,
+          isResultMode: false,
+        ),
+      );
     });
 
     on<ClearPressed>((event, emit) {
-      emit((state as CalculatorUpdated).copyWith(expression: '', result: '0'));
+      emit((state as CalculatorUpdated).copyWith(expression: '', result: '0', isResultMode: false));
     });
 
     on<EqualsPressed>((event, emit) {
       final expression = (state as CalculatorUpdated).expression;
 
-       final result = calculateResult(expression);
+      final result = calculateResult(expression);
 
-      emit((state as CalculatorUpdated).copyWith(result: result));
+      emit((state as CalculatorUpdated).copyWith(result: result, isResultMode: true));
     });
 
     on<DeletePressed>((event, emit) {
       final expression = (state as CalculatorUpdated).expression;
       if (expression.isNotEmpty) {
-        final updatedExpression = expression.substring(0, expression.length - 1);
-        emit((state as CalculatorUpdated).copyWith(expression: updatedExpression));
+        final updatedExpression = expression.substring(
+          0,
+          expression.length - 1,
+        );
+        emit(
+          (state as CalculatorUpdated).copyWith(expression: updatedExpression, isResultMode: false),
+        );
       }
     });
   }
