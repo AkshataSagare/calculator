@@ -1,8 +1,13 @@
+import 'package:calculator/calculator/presentation/bloc/calculator_bloc.dart';
 import 'package:calculator/calculator/presentation/screens/calculator_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(BlocProvider(
+    create: (context) => CalculatorBloc(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

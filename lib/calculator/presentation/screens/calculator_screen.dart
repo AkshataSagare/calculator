@@ -1,14 +1,11 @@
+import 'package:calculator/calculator/presentation/bloc/calculator_bloc.dart';
 import 'package:calculator/core/utils/buttons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class CalculatorScreen extends StatefulWidget {
+class CalculatorScreen extends StatelessWidget {
   const CalculatorScreen({super.key});
 
-  @override
-  State<CalculatorScreen> createState() => _CalculatorScreenState();
-}
-
-class _CalculatorScreenState extends State<CalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,52 +16,86 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 10.0),
-              child: Text(
-                '0',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 50,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Wrap(
-              children: Buttons.buttons
-                  .map(
-                    (e) => Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          fixedSize: Size(
-                            MediaQuery.of(context).size.width * 0.22,
-                            80,
-                          ),
-                          backgroundColor: Buttons.topRowButtons.contains(e)
-                              ? Colors.grey
-                              : Buttons.operators.contains(e)
-                              ? Colors.orange[800]
-                              : Colors.grey[900],
-                          side: BorderSide.none,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40),
-                          ),    
-                        ),
-                        onPressed: () {},
-                        child: Text(
-                          e,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+            BlocBuilder<CalculatorBloc, CalculatorState>(
+              builder: (context, state) {
+                String expression = '';
+                String result = '0';
+                if (state is CalculatorUpdated) {
+                  expression = state.expression;
+                  result = state.result;
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: Text(
+                        expression,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  )
-                  .toList(),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: Text(
+                        result,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 30,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+
+            const SizedBox(height: 20),
+            Wrap(
+              children: Buttons.buttons.map((e) {
+                return Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      fixedSize: Size(
+                        MediaQuery.of(context).size.width * 0.22,
+                        80,
+                      ),
+                      backgroundColor: Buttons.topRowButtons.contains(e)
+                          ? Colors.grey
+                          : Buttons.operators.contains(e)
+                              ? Colors.orange[800]
+                              : Colors.grey[900],
+                      side: BorderSide.none,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (e == 'C') {
+                        context.read<CalculatorBloc>().add(ClearPressed());
+                      } else if (e == '=') {
+                        context.read<CalculatorBloc>().add(EqualsPressed());
+                      } else if (e == 'DEL') {
+                        context.read<CalculatorBloc>().add(DeletePressed());
+                      } else {
+                        context.read<CalculatorBloc>().add(ButtonPressed(e));
+                      }
+                    },
+                    child: Text(
+                      e,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
