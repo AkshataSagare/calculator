@@ -9,13 +9,47 @@ class CalculatorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Calculator')),
+      appBar: AppBar(title: const Text('Calculator', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            Expanded(
+              child: BlocBuilder<CalculatorBloc, CalculatorState>(
+                builder: (context, state) {
+                  List<String> history = [];
+
+                  if (state is CalculatorUpdated) {
+                    history = state.history;
+                  }
+
+                  return ListView.builder(
+                    reverse: true,
+                    itemCount: history.length,
+                    itemBuilder: (context, index) {
+                      final item = history[history.length - 1 - index];
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 4,
+                          horizontal: 10,
+                        ),
+                        child: Text(
+                          item,
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 16,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
             BlocBuilder<CalculatorBloc, CalculatorState>(
               builder: (context, state) {
                 String expression = '';
@@ -37,7 +71,9 @@ class CalculatorScreen extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: isResultMode ? 20 : 40,
-                          fontWeight: isResultMode ? FontWeight.normal : FontWeight.w500,
+                          fontWeight: isResultMode
+                              ? FontWeight.normal
+                              : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -48,7 +84,9 @@ class CalculatorScreen extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: isResultMode ? 40 : 24,
-                          fontWeight: isResultMode ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isResultMode
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                       ),
                     ),
@@ -71,8 +109,8 @@ class CalculatorScreen extends StatelessWidget {
                       backgroundColor: Buttons.topRowButtons.contains(e)
                           ? Colors.grey
                           : Buttons.operators.contains(e)
-                              ? Colors.orange[800]
-                              : Colors.grey[900],
+                          ? Colors.orange[800]
+                          : Colors.grey[900],
                       side: BorderSide.none,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),

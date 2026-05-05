@@ -3,15 +3,31 @@ import 'package:equatable/equatable.dart';
 
 import '../../../core/calculator_logic.dart';
 import '../../../core/utils/buttons.dart';
+import '../services/shared_preferences.dart';
 
 part 'calculator_event.dart';
 part 'calculator_state.dart';
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
-  CalculatorBloc() : super(CalculatorUpdated(expression: '', result: '0', isResultMode: false)) {
+  final SharedPreferencesService sharedPreferences;
+
+  CalculatorBloc(this.sharedPreferences)
+    : super(
+        CalculatorUpdated(expression: '', result: '0', isResultMode: false),
+      ) {
     on<ButtonPressed>((event, emit) {
-      final updatedExpression =
-          (state as CalculatorUpdated).expression + event.button;
+      String updatedExpression;
+      if ((state as CalculatorUpdated).isResultMode) {
+        if (Buttons.operators.contains(event.button)) {
+          updatedExpression =
+              (state as CalculatorUpdated).result + event.button;
+        } else {
+          updatedExpression = event.button;
+        }
+      } else {
+        updatedExpression =
+            (state as CalculatorUpdated).expression + event.button;
+      }
       final result = calculateResult(updatedExpression);
       if (Buttons.operators.contains(event.button) &&
           (state as CalculatorUpdated).expression.isNotEmpty &&
@@ -31,15 +47,43 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     });
 
     on<ClearPressed>((event, emit) {
-      emit((state as CalculatorUpdated).copyWith(expression: '', result: '0', isResultMode: false));
+      if ((state as CalculatorUpdated).expression.isNotEmpty) {
+        emit(
+          (state as CalculatorUpdated).copyWith(
+            expression: '',
+            result: '0',
+            isResultMode: false,
+          ),
+        );
+      } else {
+        emit(
+          (state as CalculatorUpdated).copyWith(
+            expression: '',
+            result: '0',
+            isResultMode: false,
+            history: [],
+          ),
+        );
+        sharedPreferences.clearData();
+      }
     });
 
     on<EqualsPressed>((event, emit) {
       final expression = (state as CalculatorUpdated).expression;
 
+      final addHistory = List<String>.from((state as CalculatorUpdated).history)
+        ..add('$expression = ${calculateResult(expression)}');
+      sharedPreferences.saveData(addHistory);
+
       final result = calculateResult(expression);
 
-      emit((state as CalculatorUpdated).copyWith(result: result, isResultMode: true));
+      emit(
+        (state as CalculatorUpdated).copyWith(
+          result: result,
+          isResultMode: true,
+          history: addHistory,
+        ),
+      );
     });
 
     on<DeletePressed>((event, emit) {
@@ -50,9 +94,17 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           expression.length - 1,
         );
         emit(
-          (state as CalculatorUpdated).copyWith(expression: updatedExpression, isResultMode: false),
+          (state as CalculatorUpdated).copyWith(
+            expression: updatedExpression,
+            isResultMode: false,
+          ),
         );
       }
+    });
+
+    on<LoadData>((event, emit) async {
+      final history = await sharedPreferences.getData();
+      emit((state as CalculatorUpdated).copyWith(history: history));
     });
   }
 }
