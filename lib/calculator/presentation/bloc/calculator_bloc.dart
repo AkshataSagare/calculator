@@ -93,9 +93,11 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           0,
           expression.length - 1,
         );
+        final result = updatedExpression.isEmpty ? '0' : calculateResult(updatedExpression);
         emit(
           (state as CalculatorUpdated).copyWith(
             expression: updatedExpression,
+            result: result,
             isResultMode: false,
           ),
         );
