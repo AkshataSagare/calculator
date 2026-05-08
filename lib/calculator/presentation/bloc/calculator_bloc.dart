@@ -13,7 +13,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
   CalculatorBloc(this.sharedPreferences)
     : super(
-        CalculatorUpdated(expression: '', result: '0', isResultMode: false),
+        CalculatorUpdated(expression: '', result: '0', isResultMode: false, isScientificMode: false),
       ) {
     on<ButtonPressed>((event, emit) {
       String updatedExpression;
@@ -107,6 +107,14 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     on<LoadData>((event, emit) async {
       final history = await sharedPreferences.getData();
       emit((state as CalculatorUpdated).copyWith(history: history));
+    });
+
+    on<ToggleScientificMode>((event, emit) {
+      emit(
+        (state as CalculatorUpdated).copyWith(
+          isScientificMode: !(state as CalculatorUpdated).isScientificMode,
+        ),
+      );
     });
   }
 }

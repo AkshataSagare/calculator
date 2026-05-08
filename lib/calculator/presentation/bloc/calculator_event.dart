@@ -15,3 +15,5 @@ final class EqualsPressed extends CalculatorEvent {}
 final class DeletePressed extends CalculatorEvent {}
 
 final class LoadData extends CalculatorEvent {}
+
+final class ToggleScientificMode extends CalculatorEvent {}
