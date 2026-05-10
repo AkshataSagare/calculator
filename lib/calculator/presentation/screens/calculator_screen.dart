@@ -82,7 +82,7 @@ class CalculatorScreen extends StatelessWidget {
                           expression,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: isResultMode ? 24 : 48,
+                            fontSize: isResultMode ? 24 : 36,
                             fontWeight: isResultMode
                                 ? FontWeight.normal
                                 : FontWeight.w500,
