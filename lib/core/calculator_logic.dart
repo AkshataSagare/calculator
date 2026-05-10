@@ -23,6 +23,8 @@ String calculateResult(String expression) {
     if (openBrackets > closeBrackets) {
       finalExpression += ')' * (openBrackets - closeBrackets);
     }
+    finalExpression = _handleTrigFunctions(finalExpression);
+    finalExpression = _handleLogFunction(finalExpression);
 
     ExpressionParser parser = GrammarParser();
     Expression exp = parser.parse(finalExpression);
@@ -53,4 +55,42 @@ String _handleFactorial(String expression) {
 
     return factorial(number).toString();
   });
+}
+
+String _handleTrigFunctions(
+  String expression,
+) {
+
+  expression = expression.replaceAllMapped(
+    RegExp(r'sin\(([^)]+)\)'),
+    (match) =>
+        'sin((${match.group(1)}) * (3.14159265359 / 180))',
+  );
+
+  expression = expression.replaceAllMapped(
+    RegExp(r'cos\(([^)]+)\)'),
+    (match) =>
+        'cos((${match.group(1)}) * (3.14159265359 / 180))',
+  );
+
+  expression = expression.replaceAllMapped(
+    RegExp(r'tan\(([^)]+)\)'),
+    (match) =>
+        'tan((${match.group(1)}) * (3.14159265359 / 180))',
+  );
+
+  return expression;
+}
+
+String _handleLogFunction(
+  String expression,
+) {
+
+  expression = expression.replaceAllMapped(
+    RegExp(r'log\(([^)]+)\)'),
+    (match) =>
+        '(ln(${match.group(1)}) / ln(10))',
+  );
+
+  return expression;
 }

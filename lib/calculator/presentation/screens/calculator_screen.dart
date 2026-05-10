@@ -91,16 +91,20 @@ class CalculatorScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10.0),
-                      child: Text(
-                        result,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: isResultMode ? 48 : 30,
-                          fontWeight: isResultMode
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      reverse: true,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 10.0),
+                        child: Text(
+                          result,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: isResultMode ? 36 : 30,
+                            fontWeight: isResultMode
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
                         ),
                       ),
                     ),
@@ -108,7 +112,7 @@ class CalculatorScreen extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Expanded(
               flex: 3,
               child: BlocBuilder<CalculatorBloc, CalculatorState>(
